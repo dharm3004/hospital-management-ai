@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact - Hospital AI{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <h1>Contact Us</h1>
+  <div class="row mt-4">
+    <div class="col-md-6">
+      <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label">Name</label>
+          <input name="name" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Email</label>
+          <input name="email" type="email" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Message</label>
+          <textarea name="message" class="form-control" rows="6" required></textarea>
+        </div>
+        <button class="btn btn-primary">Send Message</button>
+      </form>
+    </div>
+    <div class="col-md-6">
+      <h5>Contact Info</h5>
+      <p>Email: contact@hospitalai.example</p>
+      <p>Phone: +1-555-123-4567</p>
+      <p>Address: 123 Health St, Wellness City</p>
+      <div class="mt-3">
+        <iframe src="https://maps.google.com/maps?q=Wellness%20City&t=&z=13&ie=UTF8&iwloc=&output=embed" width="100%" height="250" style="border:0;"> </iframe>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

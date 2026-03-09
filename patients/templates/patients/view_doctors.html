@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Available Doctors - Hospital AI{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="card fade-in-up">
+        <div class="card-header">
+          <h5 class="mb-0">Available Doctors</h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            {% for doctor in doctors %}
+              <div class="col-md-6">
+                <div class="doctor-card p-3">
+                  <div class="d-flex align-items-center">
+                    <i class="bi bi-person-circle fs-2 text-primary me-3"></i>
+                    <div>
+                      <strong>{{ doctor.user.username }}</strong><br>
+                      <small class="text-muted">{{ doctor.specialization }}</small>
+                    </div>
+                  </div>
+                  <div class="mt-3 text-end">
+                    <a href="{% url 'book_appointment' %}" class="btn btn-sm btn-primary">Book with this doctor</a>
+                  </div>
+                </div>
+              </div>
+            {% empty %}
+              <div class="col-12 text-center text-muted">
+                No doctors available at the moment.
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

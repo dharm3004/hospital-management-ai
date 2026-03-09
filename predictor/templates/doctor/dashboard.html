@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+
+{% block title %}Doctor Dashboard - Hospital AI{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row mb-4">
+    <div class="col-12">
+      <h1 class="display-5 fw-bold text-center mb-4">
+        <i class="bi bi-person-badge text-primary me-3"></i>
+        Welcome, Dr. {{ user.username }}
+      </h1>
+      <p class="lead text-center text-muted">Manage your patients and appointments</p>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-5">
+    <div class="col-md-4">
+      <div class="card dashboard-card fade-in-up">
+        <i class="bi bi-calendar-check"></i>
+        <h5 class="card-title">Patient Appointments</h5>
+        <p class="card-text">View and manage your upcoming patient appointments.</p>
+        <button class="btn btn-primary" onclick="toggleAppointments()">View Appointments</button>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card dashboard-card fade-in-up">
+        <i class="bi bi-clock"></i>
+        <h5 class="card-title">Set Availability</h5>
+        <p class="card-text">Manage your consultation hours and availability.</p>
+        <a href="{% url 'doctor_manage_availability' %}" class="btn btn-success">Manage Schedule</a>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card dashboard-card fade-in-up">
+        <i class="bi bi-graph-up"></i>
+        <h5 class="card-title">Patient Insights</h5>
+        <p class="card-text">View recent AI predictions and patient trends.</p>
+        <button class="btn btn-outline-primary" onclick="toggleInsights()">View Insights</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="appointments-section" class="row g-4" style="display: none;">
+    <div class="col-12">
+      <div class="card fade-in-up">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="bi bi-calendar-event me-2"></i>Patient Appointments</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            {% for a in appointments %}
+              <div class="col-md-6 mb-3">
+                <div class="card h-100">
+                  <div class="card-body">
+                    <h6 class="card-title">{{ a.patient.username }}</h6>
+                    <p class="card-text"><strong>Date:</strong> {{ a.date|date:"M d, Y H:i" }}</p>
+                    <p class="card-text"><strong>Reason:</strong> {{ a.reason }}</p>
+                    <div class="d-flex gap-2">
+                      <button class="btn btn-success btn-sm" onclick="approveAppointment({{ a.id }})">Approve</button>
+                      <button class="btn btn-danger btn-sm" onclick="cancelAppointment({{ a.id }})">Cancel</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% empty %}
+              <div class="col-12">
+                <p class="text-muted text-center">No pending appointments.</p>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="insights-section" class="row g-4" style="display: none;">
+    <div class="col-12">
+      <div class="card fade-in-up">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="bi bi-bar-chart-line me-2"></i>Recent Patient Predictions</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            {% for p in recent_predictions %}
+              <div class="col-md-6 mb-3">
+                <div class="card h-100">
+                  <div class="card-body">
+                    <h6 class="card-title">{% if p.user %}{{ p.user.username }}{% else %}Anonymous{% endif %}</h6>
+                    <p class="card-text"><strong>Date:</strong> {{ p.created|date:"M d, Y H:i" }}</p>
+                    <p class="card-text"><strong>Symptoms:</strong> {{ p.symptoms|join:", " }}</p>
+                    <div class="mb-2">
+                      {% if p.results %}
+                        <strong>Top Prediction:</strong> {{ p.results.0.disease }} ({{ p.results.0.probability|floatformat:1 }}%)
+                      {% else %}
+                        <em>No results available</em>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% empty %}
+              <div class="col-12">
+                <p class="text-muted text-center">No recent predictions.</p>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-md-6">
+      <div class="card fade-in-up">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="bi bi-file-earmark-text me-2"></i>Prescription Management</h5>
+        </div>
+        <div class="card-body">
+          <p class="text-muted mb-0">Create and manage patient prescriptions.</p>
+          <a href="#" class="btn btn-outline-primary mt-3">Manage Prescriptions</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card fade-in-up">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="bi bi-people me-2"></i>Patient Statistics</h5>
+        </div>
+        <div class="card-body">
+          <div class="row text-center">
+            <div class="col-6">
+              <h3 class="text-primary">{{ appointments|length }}</h3>
+              <small class="text-muted">Pending Appointments</small>
+            </div>
+            <div class="col-6">
+              <h3 class="text-success">{{ recent_predictions|length }}</h3>
+              <small class="text-muted">Recent Predictions</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleAppointments() {
+  const section = document.getElementById('appointments-section');
+  section.style.display = section.style.display === 'none' ? 'block' : 'none';
+}
+
+function toggleInsights() {
+  const section = document.getElementById('insights-section');
+  section.style.display = section.style.display === 'none' ? 'block' : 'none';
+}
+
+function approveAppointment(id) {
+  if (confirm('Approve this appointment?')) {
+    // AJAX call to approve appointment
+    fetch(`/appointment/${id}/approve/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken'),
+        'Content-Type': 'application/json'
+      }
+    }).then(response => {
+      if (response.ok) {
+        location.reload();
+      }
+    });
+  }
+}
+
+function cancelAppointment(id) {
+  if (confirm('Cancel this appointment?')) {
+    // AJAX call to cancel appointment
+    fetch(`/appointment/${id}/cancel/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken'),
+        'Content-Type': 'application/json'
+      }
+    }).then(response => {
+      if (response.ok) {
+        location.reload();
+      }
+    });
+  }
+}
+
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+</script>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Doctors - Hospital AI{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <h1 class="mb-4">Our Doctors</h1>
+  <div class="row g-4">
+    {% for d in doctors %}
+      <div class="col-md-4">
+        <div class="card h-100">
+          <div class="card-body text-center">
+            <div class="mb-3">
+              <i class="bi bi-person-circle fs-1 text-primary"></i>
+            </div>
+            <h5 class="card-title">Dr. {{ d.user.first_name }} {{ d.user.last_name }}</h5>
+            <p class="text-muted">{{ d.get_specialization_display }}</p>
+            <p>Experience: {{ d.experience_years }} years</p>
+            <p class="small text-muted">Availability: {% for s in d.user.availability_slots.all %}{{ s.date }} {% endfor %}</p>
+            <a href="{% url 'book_appointment' %}" class="btn btn-primary">Book Appointment</a>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-12"><p class="text-muted">No doctors found.</p></div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

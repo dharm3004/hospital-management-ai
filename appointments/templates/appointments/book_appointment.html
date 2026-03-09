@@ -1,0 +1,164 @@
+<div class="container py-5">
+  <div class="row mb-4">
+    <div class="col-12">
+      <h1 class="display-5 fw-bold text-center mb-4">
+        <i class="bi bi-calendar-plus text-primary me-3"></i>
+        Book an Appointment
+      </h1>
+      <p class="lead text-center text-muted">Schedule a consultation with a healthcare professional</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-8 offset-lg-2">
+      <div class="card fade-in-up">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="bi bi-calendar-event me-2"></i>Appointment Details</h5>
+        </div>
+        <div class="card-body p-4">
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+
+          <form method="post" id="appointment-form">
+            {% csrf_token %}
+            <div class="mb-3 row">
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Department</label>
+                <select id="department-select" class="form-select">
+                  <option value="">All Departments</option>
+                  {% for d in departments %}
+                    <option value="{{ d }}">{{ d }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Search Doctor</label>
+                <input id="doctor-filter" class="form-control" placeholder="Search by name or specialization">
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label fw-bold mb-3">
+                <i class="bi bi-person-badge text-primary me-2"></i>Select Doctor
+              </label>
+              <div class="row" id="doctors-list">
+                {% for doctor in doctors %}
+                  <div class="col-md-6 mb-3 doctor-item" data-specialization="{{ doctor.doctor_profile.specialization }}">
+                    <div class="doctor-card p-3 glass d-flex align-items-center gap-3">
+                      <label style="width:100%;cursor:pointer;">
+                        <input type="radio" name="doctor" value="{{ doctor.id }}" class="form-check-input doctor-option me-2" required>
+                        <i class="bi bi-person-circle fs-3 text-primary"></i>
+                        <span class="ms-2">
+                          <strong>{{ doctor.get_full_name|default:doctor.username }}</strong><br>
+                          <small class="text-muted">{{ doctor.doctor_profile.get_specialization_display }}</small>
+                        </span>
+                        <span class="float-end text-muted small">{{ doctor.doctor_profile.experience_years }} yrs</span>
+                      </label>
+                    </div>
+                  </div>
+                {% empty %}
+                  <div class="col-12">
+                    <p class="text-muted text-center">No doctors available at the moment.</p>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-bold">
+                  <i class="bi bi-calendar text-primary me-2"></i>Date
+                </label>
+                <input name="date" id="date-input" type="date" class="form-control form-control-lg" required>
+                <small class="text-muted d-block mt-1">Select appointment date</small>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label fw-bold">
+                  <i class="bi bi-clock text-primary me-2"></i>Time
+                </label>
+                <select name="time" id="time-select" class="form-select form-select-lg" required>
+                  <option value="">Select date first</option>
+                </select>
+                <small class="text-muted d-block mt-1">Select appointment time</small>
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <label class="form-label fw-bold">
+                <i class="bi bi-chat-dots text-primary me-2"></i>Reason for Appointment
+              </label>
+              <textarea name="reason" class="form-control" rows="4" placeholder="Describe your symptoms or reason for visit..."></textarea>
+              <small class="text-muted d-block mt-1">Help the doctor understand your needs</small>
+            </div>
+
+            <div class="mt-5 pt-3 border-top">
+              <div class="row">
+                <div class="col-md-6">
+                  <a href="{% url 'patient_dashboard' %}" class="btn btn-outline-secondary btn-lg w-100">
+                    <i class="bi bi-arrow-left me-2"></i>Cancel
+                  </a>
+                </div>
+                <div class="col-md-6">
+                  <button type="submit" class="btn btn-primary btn-lg w-100">
+                    <i class="bi bi-check-circle me-2"></i>Confirm Appointment
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Filter doctors by department and name
+document.getElementById('department-select').addEventListener('change', function(){
+  const val = this.value;
+  document.querySelectorAll('.doctor-item').forEach(item => {
+    const spec = item.dataset.specialization || '';
+    item.style.display = (!val || spec.toLowerCase().includes(val.toLowerCase())) ? 'block' : 'none';
+  });
+});
+document.getElementById('doctor-filter').addEventListener('input', function(){
+  const q = this.value.toLowerCase();
+  document.querySelectorAll('.doctor-item').forEach(item => {
+    const txt = item.innerText.toLowerCase();
+    item.style.display = txt.includes(q) ? 'block' : 'none';
+  });
+});
+
+// When date changes, fetch available slots for selected doctor
+document.getElementById('date-input').addEventListener('change', function(){
+  const date = this.value;
+  const doctor = document.querySelector('.doctor-option:checked');
+  if(!doctor){ return; }
+  fetch(`/appointment/available-slots/?doctor_id=${doctor.value}&date=${date}`)
+    .then(r=>r.json()).then(data=>{
+      const sel = document.getElementById('time-select'); sel.innerHTML='';
+      if(data.slots && data.slots.length){
+        data.slots.forEach(s=>{ const opt=document.createElement('option'); opt.value=s.start; opt.innerText=`${s.start} - ${s.end}`; sel.appendChild(opt); });
+      }else{ const opt=document.createElement('option'); opt.value=''; opt.innerText='No slots available'; sel.appendChild(opt); }
+    }).catch(err=>{ console.error(err); });
+});
+
+// If doctor selection changes, update slots if date already set
+document.querySelectorAll('.doctor-option').forEach(r=> r.addEventListener('change', function(){
+  const date = document.getElementById('date-input').value;
+  if(date){ fetch(`/appointment/available-slots/?doctor_id=${this.value}&date=${date}`).then(r=>r.json()).then(data=>{
+    const sel = document.getElementById('time-select'); sel.innerHTML='';
+    if(data.slots && data.slots.length){ data.slots.forEach(s=>{ const opt=document.createElement('option'); opt.value=s.start; opt.innerText=`${s.start} - ${s.end}`; sel.appendChild(opt); }); }
+    else{ const opt=document.createElement('option'); opt.value=''; opt.innerText='No slots available'; sel.appendChild(opt); }
+  }); }
+}));
+</script>

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}News - Hospital AI{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <h1>Hospital News</h1>
+  <div class="row g-4 mt-3">
+    {% for n in news %}
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <h5>{{ n.title }}</h5>
+            <small class="text-muted">{{ n.date }}</small>
+            <p class="mt-2">{{ n.summary }}</p>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

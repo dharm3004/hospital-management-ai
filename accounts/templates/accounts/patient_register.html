@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Patient Registration - Hospital AI{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card fade-in-up">
+        <div class="card-body p-5">
+          <h2 class="card-title text-center mb-4">
+            <i class="bi bi-person-plus text-primary me-2"></i>
+            Patient Registration
+          </h2>
+          {% if error %}
+            <div class="alert alert-danger">{{ error }}</div>
+          {% endif %}
+          <form method="post">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            <div class="mb-3">
+              {{ form.username.label_tag }}
+              {{ form.username }}
+              {{ form.username.errors }}
+            </div>
+            <div class="mb-3">
+              {{ form.email.label_tag }}
+              {{ form.email }}
+              {{ form.email.errors }}
+            </div>
+            <div class="mb-3">
+              {{ form.password1.label_tag }}
+              {{ form.password1 }}
+              {{ form.password1.errors }}
+            </div>
+            <div class="mb-3">
+              {{ form.password2.label_tag }}
+              {{ form.password2 }}
+              {{ form.password2.errors }}
+            </div>
+            <button class="btn btn-success w-100 mb-3">Register</button>
+          </form>
+          <div class="text-center">
+            <p class="mb-0">Already have an account? <a href="{% url 'patient_login' %}">Login here</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- HERO -->
+<section class="py-5" style="background: linear-gradient(135deg, rgba(14,165,233,0.08), rgba(16,185,129,0.03));">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-7">
+        <h1 class="display-4 fw-bold">AI Powered Healthcare</h1>
+        <p class="lead text-muted">Manage your health and access condition information and services.</p>
+        <div class="d-flex gap-3 mt-4">
+          <a href="{% url 'ai_diagnosis' %}" class="btn btn-primary btn-lg">AI Diagnosis</a>
+          <a href="{% url 'disease_list' %}" class="btn btn-primary btn-lg">Learn Conditions</a>
+          <a href="{% url 'book_appointment' %}" class="btn btn-outline-primary btn-lg">Book Appointment</a>
+          <a href="{% url 'emergency' %}" class="btn btn-danger btn-lg">Emergency</a>
+        </div>
+      </div>
+      <div class="col-lg-5 d-none d-lg-block">
+        <div class="card p-4 glass">
+          <h5 class="mb-3">Health Conditions</h5>
+          <p class="small text-muted">Browse conditions, symptoms and recommended departments.</p>
+          <a href="{% url 'disease_list' %}" class="btn btn-sm btn-primary mt-2">Explore Conditions</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="py-5">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <a href="{% url 'ai_diagnosis' %}" class="text-decoration-none text-dark">
+          <div class="card glass p-4 text-center">
+            <i class="bi bi-robot fs-1 text-primary mb-2"></i>
+            <h5>AI Diagnosis</h5>
+            <p class="small text-muted">Fast symptom analysis using machine learning.</p>
+          </div>
+        </a>
+      </div>
+      <div class="col-md-4">
+        <div class="card glass p-4 text-center">
+          <i class="bi bi-calendar-check fs-1 text-success mb-2"></i>
+          <h5>Online Appointments</h5>
+          <p class="small text-muted">Schedule consultations with specialists in seconds.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card glass p-4 text-center">
+          <i class="bi bi-shield-check fs-1 text-danger mb-2"></i>
+          <h5>Secure & Private</h5>
+          <p class="small text-muted">Your data is protected with industry-standard practices.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DOCTORS -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h4 class="mb-0">Meet Our Doctors</h4>
+      <a href="{% url 'doctors_list' %}">View all</a>
+    </div>
+    <div class="row g-3">
+      <div class="col-md-4">
+        <div class="card glass p-3 d-flex gap-2">
+          <div class="d-flex align-items-center gap-3">
+            <div class="avatar bg-primary rounded-circle text-white d-flex align-items-center justify-content-center" style="width:56px;height:56px;">D</div>
+            <div>
+              <h6 class="mb-0">Dr. Sarah Lee</h6>
+              <small class="text-muted">Cardiologist</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card glass p-3 d-flex gap-2">
+          <div class="d-flex align-items-center gap-3">
+            <div class="avatar bg-success rounded-circle text-white d-flex align-items-center justify-content-center" style="width:56px;height:56px;">M</div>
+            <div>
+              <h6 class="mb-0">Dr. Mark Chen</h6>
+              <small class="text-muted">Neurologist</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card glass p-3 d-flex gap-2">
+          <div class="d-flex align-items-center gap-3">
+            <div class="avatar bg-info rounded-circle text-white d-flex align-items-center justify-content-center" style="width:56px;height:56px;">A</div>
+            <div>
+              <h6 class="mb-0">Dr. Anita Roy</h6>
+              <small class="text-muted">Pediatrics</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DEPARTMENTS + STATS -->
+<section class="py-5">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-6">
+        <h5>Departments</h5>
+        <div class="d-flex flex-wrap gap-3 mt-3">
+          <span class="badge bg-white text-dark p-3 glass">Cardiology</span>
+          <span class="badge bg-white text-dark p-3 glass">Neurology</span>
+          <span class="badge bg-white text-dark p-3 glass">Orthopedics</span>
+          <span class="badge bg-white text-dark p-3 glass">Pediatrics</span>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="d-flex gap-3 justify-content-end">
+          <div class="text-center">
+            <h3 class="mb-0 text-primary">12k+</h3>
+            <small class="text-muted">Patients</small>
+          </div>
+          <div class="text-center">
+            <h3 class="mb-0 text-success">250+</h3>
+            <small class="text-muted">Doctors</small>
+          </div>
+          <div class="text-center">
+            <h3 class="mb-0 text-primary">48k+</h3>
+            <small class="text-muted">Diagnoses</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="py-5 bg-primary text-white">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h4 class="mb-1">Ready for a professional consultation?</h4>
+        <p class="small mb-0 opacity-75">Book an appointment with our experienced specialists.</p>
+      </div>
+      <div>
+        <a href="{% url 'book_appointment' %}" class="btn btn-light btn-lg">Book Appointment</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

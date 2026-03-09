@@ -1,0 +1,239 @@
+{% extends 'base.html' %}
+
+{% block title %}Book Appointment - Hospital AI{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row mb-4">
+    <div class="col-12">
+      <h1 class="display-5 fw-bold text-center mb-4">
+        <i class="bi bi-calendar-plus text-primary me-3"></i>
+        Book an Appointment
+      </h1>
+      <p class="lead text-center text-muted">Schedule a consultation with a healthcare professional</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-8 offset-lg-2">
+      <div class="card fade-in-up">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="bi bi-calendar-event me-2"></i>Appointment Details</h5>
+        </div>
+        <div class="card-body p-4">
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+
+          <form method="post" id="appointment-form">
+            {% csrf_token %}
+
+            <div class="mb-4">
+              <label class="form-label fw-bold mb-3">
+                <i class="bi bi-person-badge text-primary me-2"></i>Select Doctor
+              </label>
+              <div class="row">
+                {% for doctor in doctors %}
+                  <div class="col-md-6 mb-3">
+                    <div class="doctor-card">
+                      <label class="custom-control custom-radio">
+                        <input type="radio" name="doctor" value="{{ doctor.id }}" class="custom-control-input doctor-option" required>
+                        <span class="doctor-card-content">
+                          <i class="bi bi-person-circle fs-3 text-primary me-2"></i>
+                          <span>
+                            <strong>{{ doctor.username }}</strong><br>
+                            <small class="text-muted">Healthcare Professional</small>
+                          </span>
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+                {% empty %}
+                  <div class="col-12">
+                    <p class="text-muted text-center">No doctors available at the moment.</p>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-bold">
+                  <i class="bi bi-calendar text-primary me-2"></i>Date
+                </label>
+                <input name="date" type="date" class="form-control form-control-lg" required>
+                <small class="text-muted d-block mt-1">Select appointment date</small>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label fw-bold">
+                  <i class="bi bi-clock text-primary me-2"></i>Time
+                </label>
+                <input name="time" type="time" class="form-control form-control-lg" required>
+                <small class="text-muted d-block mt-1">Select appointment time</small>
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <label class="form-label fw-bold">
+                <i class="bi bi-chat-dots text-primary me-2"></i>Reason for Appointment
+              </label>
+              <textarea name="reason" class="form-control" rows="4" placeholder="Describe your symptoms or reason for visit..."></textarea>
+              <small class="text-muted d-block mt-1">Help the doctor understand your needs</small>
+            </div>
+
+            <div class="mt-5 pt-3 border-top">
+              <div class="row">
+                <div class="col-md-6">
+                  <a href="{% url 'patient_dashboard' %}" class="btn btn-outline-secondary btn-lg w-100">
+                    <i class="bi bi-arrow-left me-2"></i>Cancel
+                  </a>
+                </div>
+                <div class="col-md-6">
+                  <button type="submit" class="btn btn-primary btn-lg w-100">
+                    <i class="bi bi-check-circle me-2"></i>Confirm Appointment
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Doctor Info Cards -->
+      <div class="mt-5">
+        <h5 class="mb-4">
+          <i class="bi bi-info-circle-fill text-info me-2"></i>Why Book with Us?
+        </h5>
+        <div class="row g-3">
+          <div class="col-md-4">
+            <div class="feature-card">
+              <i class="bi bi-shield-check text-success"></i>
+              <h6>Verified Professionals</h6>
+              <p class="small text-muted">All doctors are qualified and verified</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="feature-card">
+              <i class="bi bi-clock-history text-warning"></i>
+              <h6>Flexible Scheduling</h6>
+              <p class="small text-muted">Choose from available time slots</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="feature-card">
+              <i class="bi bi-telephone-fill text-danger"></i>
+              <h6>Easy Consultation</h6>
+              <p class="small text-muted">Quick and easy online consultations</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.doctor-card {
+  cursor: pointer;
+  border: 2px solid #e9ecef;
+  border-radius: 15px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.doctor-card:hover {
+  border-color: var(--primary-blue);
+  box-shadow: 0 10px 30px rgba(0, 123, 255, 0.1);
+  transform: translateY(-3px);
+}
+
+.doctor-option:checked ~ .doctor-card-content {
+  color: var(--primary-blue);
+}
+
+.doctor-card input:checked ~ .doctor-card-content {
+  font-weight: 600;
+  color: var(--primary-blue);
+}
+
+.custom-control {
+  display: block;
+  min-height: 1.5rem;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.custom-control-input {
+  position: absolute;
+  left: 0;
+  z-index: -1;
+  width: 1rem;
+  height: 1.25rem;
+  opacity: 0;
+}
+
+.custom-radio .custom-control-label::before {
+  border-radius: 50%;
+}
+
+.custom-control-label {
+  position: relative;
+  margin-bottom: 0;
+  vertical-align: top;
+  cursor: pointer;
+}
+
+.doctor-card-content {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.feature-card {
+  text-align: center;
+  padding: 20px;
+  border-radius: 15px;
+  background: #f8f9fa;
+  transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+  background: white;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.feature-card i {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  display: block;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('appointment-form');
+  const today = new Date().toISOString().split('T')[0];
+  const dateInput = form.querySelector('input[name="date"]');
+  dateInput.min = today;
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const doctor = form.querySelector('input[name="doctor"]:checked');
+    if (!doctor) {
+      alert('Please select a doctor');
+      return;
+    }
+    form.submit();
+  });
+});
+</script>
+{% endblock %}

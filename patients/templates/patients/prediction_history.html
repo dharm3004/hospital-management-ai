@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Diagnosis History - Hospital AI{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="card fade-in-up">
+        <div class="card-header">
+          <h5 class="mb-0">Your Diagnosis History</h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-4">
+            <canvas id="predictionChart" height="120"></canvas>
+          </div>
+          <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+          <script>
+            const labels = [
+              {% for p in predictions %}
+                '{{ p.created_at|date:"M d, Y" }}'{% if not forloop.last %},{% endif %}
+              {% endfor %}
+            ];
+            const dataPoints = [
+              {% for p in predictions %}
+                {% if p.results and p.results.0.probability %}{{ p.results.0.probability|floatformat:2 }}{% else %}0{% endif %}{% if not forloop.last %},{% endif %}
+              {% endfor %}
+            ];
+
+            new Chart(document.getElementById('predictionChart'), {
+              type: 'line',
+              data: {
+                labels: labels,
+                datasets: [{
+                  label: 'Top Diagnosis Probability (%)',
+                  data: dataPoints,
+                  borderColor: '#0d6efd',
+                  backgroundColor: 'rgba(13,110,253,0.1)',
+                  tension: 0.3,
+                  fill: true,
+                }]
+              },
+              options: {
+                responsive: true,
+                scales: {
+                  y: { beginAtZero: true, max: 100 }
+                }
+              }
+            });
+          </script>
+          {% for p in predictions %}
+            <div class="mb-3 border-bottom pb-2">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <strong>{{ p.created_at|date:"M d, Y H:i" }}</strong>
+                  <div class="small text-muted">Symptoms: {{ p.symptoms|join:", " }}</div>
+                </div>
+                <div>
+                  {% for r in p.results %}
+                    <div>{{ r.disease }} — {{ r.probability|floatformat:1 }}%</div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          {% empty %}
+            <p class="text-muted text-center">No diagnosis history available.</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

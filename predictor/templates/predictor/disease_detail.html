@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="card p-3">
+    <h3>{{ disease.name }}</h3>
+    <p class="lead">{{ disease.short_description }}</p>
+    <h5>Common Symptoms</h5>
+    <p>{{ disease.symptoms }}</p>
+    <h5>Treatment</h5>
+    <p>{{ disease.treatment }}</p>
+  </div>
+</div>
+{% endblock %}

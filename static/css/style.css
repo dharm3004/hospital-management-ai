@@ -1,0 +1,249 @@
+/* Healthcare Theme */
+:root {
+  --primary-blue: #0ea5e9;
+  --secondary-teal: #10b981;
+  --accent-red: #ef4444;
+  --light-bg: #f8fafc;
+  --dark-text: #0f172a;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  background: var(--light-bg);
+  color: var(--dark-text);
+  min-height: 100vh;
+  margin: 0;
+}
+
+.navbar {
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(6px);
+}
+
+.navbar .nav-link {
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+.navbar .nav-link:hover {
+  color: var(--primary-blue) !important;
+  transform: translateY(-2px);
+}
+
+.hero-section {
+  background: linear-gradient(135deg, rgba(14,165,233,0.95) 0%, rgba(16,185,129,0.9) 100%);
+  color: white;
+  padding: 60px 0;
+  text-align: center;
+}
+
+.hero-section h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.hero-section p {
+  font-size: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.card {
+  border: none;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(16,24,40,0.06);
+  transition: transform 0.28s ease, box-shadow 0.28s ease;
+  background: rgba(255,255,255,0.65);
+  backdrop-filter: blur(6px) saturate(120%);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.btn-primary {
+  background: var(--primary-blue);
+  border: none;
+  border-radius: 12px;
+  padding: 8px 20px;
+  font-weight: 600;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 8px 24px rgba(14,165,233,0.18);
+  transform: translateY(-3px);
+}
+
+.btn-success {
+  background: var(--secondary-teal);
+  border: none;
+  border-radius: 25px;
+  padding: 10px 30px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-success:hover {
+  background: #17a2b8;
+  transform: scale(1.05);
+}
+
+.form-control {
+  border-radius: 10px;
+  border: 2px solid #e9ecef;
+  padding: 12px 20px;
+  transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+}
+
+.progress-bar {
+  background: linear-gradient(90deg, var(--primary-blue), var(--secondary-teal));
+  transition: width 1.5s ease-in-out;
+}
+
+.dashboard-card {
+  text-align: center;
+  padding: 30px;
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0,123,255,0.1), transparent);
+  transition: left 0.5s;
+}
+
+.dashboard-card:hover::before {
+  left: 100%;
+}
+
+.dashboard-card i {
+  font-size: 3rem;
+  color: var(--primary-blue);
+  margin-bottom: 1rem;
+  transition: color 0.3s ease;
+}
+
+.dashboard-card:hover i {
+  color: var(--secondary-teal);
+}
+
+.symptom-btn {
+  border-radius: 20px;
+  margin: 5px;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  background: #f8f9fa;
+  color: #6c757d;
+}
+
+.symptom-btn:hover {
+  transform: scale(1.05);
+  border-color: var(--primary-blue);
+  background: white;
+  color: var(--primary-blue);
+}
+
+.symptom-btn.selected {
+  background: var(--primary-blue);
+  color: white;
+  border-color: var(--primary-blue);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* glass class for subtle glassmorphism */
+.glass {
+  background: rgba(255,255,255,0.7);
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(16,24,40,0.06);
+  border: 1px solid rgba(255,255,255,0.4);
+}
+
+/* subtle hover lift */
+.card:hover, .glass:hover { transform: translateY(-6px); box-shadow: 0 18px 40px rgba(16,24,40,0.08); }
+
+/* hero tweaks */
+.display-4 { font-weight:700; }
+
+/* responsive */
+@media (max-width: 768px){
+  .display-4 { font-size: 2rem; }
+  .avatar { width:48px;height:48px }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid var(--primary-blue);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 20px auto;
+}
+
+/* smaller spinner for buttons */
+.loading-spinner[style] {
+  width: 20px !important;
+  height: 20px !important;
+  border-width: 3px !important;
+}
+
+/* AI Diagnosis page specific */
+.symptom-btn.selected { background-color: #0d6efd; color: #fff; }
+#results { min-height: 220px; }
+.dropdown-menu { border-radius: 12px; box-shadow: 0 10px 30px rgba(16,24,40,0.06); }
+.symptom-icon { font-size: 18px; width:18px; }
+.badge { border-radius: 999px; }
+
+#loading-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.8);
+  z-index: 9999;
+  backdrop-filter: blur(5px);
+}
+
+#toast-container .toast {
+  min-width: 300px;
+  border-radius: 10px;
+  animation: fadeInUp 0.3s ease-out;
+}
+
+footer {
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--dark-text);
+  padding: 20px 0;
+  margin-top: auto;
+}

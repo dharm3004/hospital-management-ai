@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}Patient Dashboard - Hospital AI{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row mb-4">
+    <div class="col-12">
+      <h1 class="display-5 fw-bold text-center mb-4">
+        <i class="bi bi-person-circle text-primary me-3"></i>
+        Welcome, {{ user.username }}
+      </h1>
+      <p class="lead text-center text-muted">Manage your health and appointments</p>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-5">
+    <div class="col-md-4">
+      <div class="card dashboard-card fade-in-up">
+        <i class="bi bi-robot"></i>
+        <h5 class="card-title">AI Diagnosis</h5>
+        <p class="card-text">Analyze symptoms with our AI model.</p>
+        <a href="{% url 'ai_diagnosis' %}" class="btn btn-primary">Diagnose</a>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card dashboard-card fade-in-up">
+        <i class="bi bi-calendar-plus"></i>
+        <h5 class="card-title">Book Appointment</h5>
+        <p class="card-text">Schedule appointments with healthcare professionals.</p>
+        <a href="{% url 'book_appointment' %}" class="btn btn-success">Book Now</a>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card dashboard-card fade-in-up">
+        <i class="bi bi-clipboard-data"></i>
+        <h5 class="card-title">Diagnosis History</h5>
+        <p class="card-text">View your past AI diagnoses and results.</p>
+        <button class="btn btn-outline-primary" onclick="toggleHistory()">View History</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="history-section" class="row g-4" style="display: none;">
+    <div class="col-12">
+      <div class="card fade-in-up">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Diagnosis History</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            {% for p in recent %}
+              <div class="col-md-6 mb-3">
+                <div class="card h-100">
+                  <div class="card-body">
+                    <h6 class="card-title">{{ p.created|date:"M d, Y H:i" }}</h6>
+                    <p class="card-text"><strong>Symptoms:</strong> {{ p.symptoms|join:", " }}</p>
+                    <div class="mb-2">
+                      {% for r in p.results %}
+                        <div class="mb-1">
+                          <strong>{{ r.disease }}</strong> — {{ r.probability|floatformat:1 }}%
+                        </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% empty %}
+              <div class="col-12">
+                <p class="text-muted text-center">No diagnosis history yet.</p>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-md-6">
+      <div class="card fade-in-up">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="bi bi-calendar-check me-2"></i>Upcoming Appointments</h5>
+        </div>
+        <div class="card-body">
+          {% for a in appointments %}
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <div>
+                <strong>{{ a.doctor.username }}</strong><br>
+                <small class="text-muted">{{ a.date|date:"M d, Y H:i" }}</small>
+              </div>
+              <span class="badge bg-primary">{{ a.reason|truncatechars:20 }}</span>
+            </div>
+          {% empty %}
+            <p class="text-muted mb-0">No upcoming appointments.</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card fade-in-up">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="bi bi-file-earmark-text me-2"></i>Prescriptions</h5>
+        </div>
+        <div class="card-body">
+          {% for p in prescriptions %}
+            <div class="mb-3">
+              <strong>{{ p.doctor.username }}</strong> — {{ p.created|date:"M d, Y" }}<br>
+              <small class="text-muted">{{ p.notes|truncatechars:100 }}</small>
+            </div>
+          {% empty %}
+            <p class="text-muted mb-0">No prescriptions yet.</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleHistory() {
+  const section = document.getElementById('history-section');
+  section.style.display = section.style.display === 'none' ? 'block' : 'none';
+}
+</script>
+{% endblock %}

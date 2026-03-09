@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}Chat Assistant - Hospital AI{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0"><i class="bi bi-chat-dots me-2 text-primary"></i>Health Chat Assistant</h5>
+          <small class="text-muted">Powered by Hospital AI</small>
+        </div>
+        <div class="card-body" style="height:60vh; overflow-y:auto;" id="chat-window">
+          <div id="messages" class="d-flex flex-column gap-3"></div>
+        </div>
+        <div class="card-footer">
+          <div class="input-group">
+            <input id="chat-input" class="form-control" placeholder="Ask a health question..." aria-label="Message">
+            <button id="send-btn" class="btn btn-primary" type="button"><i class="bi bi-send"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function appendMessage(text, who='bot'){
+  const container = document.getElementById('messages');
+  const wrapper = document.createElement('div');
+  wrapper.className = who === 'bot' ? 'align-self-start' : 'align-self-end';
+  wrapper.innerHTML = `
+    <div class="p-3 rounded shadow-sm" style="max-width:80%; background:${who==='bot'? '#f1f5f9':'#0ea5e9'}; color:${who==='bot'? '#0f172a':'#fff'};">
+      ${text}
+    </div>`;
+  container.appendChild(wrapper);
+  const win = document.getElementById('chat-window');
+  win.scrollTop = win.scrollHeight;
+}
+
+async function sendMessage(){
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if(!text) return;
+  appendMessage(text, 'user');
+  input.value = '';
+  appendMessage('Thinking...', 'bot');
+  try{
+    const res = await fetch('{% url "chat_assistant_api" %}', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','X-CSRFToken': getCookie('csrftoken')},
+      body: JSON.stringify({message: text})
+    });
+    const data = await res.json();
+    // remove the last 'Thinking...' message
+    const msgs = document.getElementById('messages');
+    if(msgs.lastChild) msgs.removeChild(msgs.lastChild);
+    appendMessage(data.reply || 'Sorry, I could not respond right now.', 'bot');
+  }catch(e){
+    console.error(e);
+    appendMessage('Network error. Please try again later.', 'bot');
+  }
+}
+
+document.getElementById('send-btn').addEventListener('click', sendMessage);
+document.getElementById('chat-input').addEventListener('keydown', function(e){ if(e.key==='Enter') sendMessage();});
+
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+</script>
+
+{% endblock %}

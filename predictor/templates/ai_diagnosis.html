@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}AI Diagnosis{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="mb-4 text-center">AI Diagnosis</h1>
+    <p class="text-center">Select your symptoms and click <strong>Diagnose</strong>.</p>
+    {% if not symptoms %}
+      <div class="alert alert-warning text-center">AI service is temporarily unavailable. Please try again later.</div>
+    {% endif %}
+
+    <div class="mb-3">
+        <input type="text" id="symptom-search" class="form-control" placeholder="Search symptoms...">
+    </div>
+    <div id="symptom-list" class="list-group mb-3" style="max-height:200px; overflow-y:auto;">
+        <!-- populated with symptoms -->
+    </div>
+    <div id="selected-symptoms" class="mb-3">
+        <small id="symptom-placeholder" class="text-muted">No symptoms selected</small>
+        <!-- tags inserted here -->
+    </div>
+    <button id="diagnose-btn" class="btn btn-primary">Diagnose</button>
+    <div id="prediction-results" class="mt-4"></div>
+</div>
+
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function initSymptomDropdown(symptoms) {
+    const dropdown = document.getElementById('symptom-list');
+    dropdown.innerHTML = '';
+    symptoms.forEach(symptom => {
+        const li = document.createElement('a');
+        li.className = 'list-group-item list-group-item-action symptom-btn';
+        li.textContent = symptom;
+        li.dataset.symptom = symptom;
+        li.href = '#';
+        li.addEventListener('click', e => {
+            e.preventDefault();
+            toggleSymptomSelection(symptom);
+        });
+        dropdown.appendChild(li);
+    });
+}
+
+function toggleSymptomSelection(symptom) {
+    const container = document.getElementById('selected-symptoms');
+    const exists = [...container.children].some(ch => ch.textContent.trim() === symptom);
+    if (exists) {
+        removeSymptom(symptom);
+    } else {
+        addSymptom(symptom);
+    }
+}
+
+function addSymptom(symptom) {
+    const container = document.getElementById('selected-symptoms');
+    // remove placeholder if present
+    const placeholder = document.getElementById('symptom-placeholder');
+    if (placeholder) {
+        placeholder.remove();
+    }
+    // avoid duplicates
+    if ([...container.children].some(ch => ch.textContent.trim() === symptom)) return;
+    const span = document.createElement('span');
+    span.className = 'badge bg-secondary me-1';
+    span.textContent = symptom;
+    span.style.cursor = 'pointer';
+    span.title = 'Click to remove';
+    span.addEventListener('click', () => removeSymptom(symptom));
+    container.appendChild(span);
+    // mark dropdown item as selected
+    const items = document.querySelectorAll('#symptom-list .symptom-btn');
+    items.forEach(it => {
+        if (it.dataset.symptom === symptom) it.classList.add('selected');
+    });
+}
+
+function removeSymptom(symptom) {
+    const container = document.getElementById('selected-symptoms');
+    [...container.children].forEach(ch => {
+        if (ch.textContent.trim() === symptom) {
+            container.removeChild(ch);
+        }
+    });
+    // unmark dropdown item
+    const items = document.querySelectorAll('#symptom-list .symptom-btn');
+    items.forEach(it => {
+        if (it.dataset.symptom === symptom) it.classList.remove('selected');
+    });
+    // if container empty, add placeholder back
+    if (container.children.length === 0) {
+        const small = document.createElement('small');
+        small.id = 'symptom-placeholder';
+        small.className = 'text-muted';
+        small.textContent = 'No symptoms selected';
+        container.appendChild(small);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const symptoms = JSON.parse('{{ symptoms|escapejs }}');
+    if (!Array.isArray(symptoms) || symptoms.length === 0) {
+        console.warn('No symptoms loaded');
+        document.getElementById('symptom-list').innerHTML = '<div class="alert alert-warning">No symptoms available</div>';
+        return;
+    }
+    initSymptomDropdown(symptoms);
+
+    document.getElementById('diagnose-btn').addEventListener('click', async () => {
+        const selected = Array.from(document.querySelectorAll('#selected-symptoms .badge'))
+            .map(el => el.textContent.trim());
+        const resultsDiv = document.getElementById('prediction-results');
+        if (selected.length === 0) {
+            resultsDiv.innerHTML = '<div class="alert alert-warning">Please select at least one symptom.</div>';
+            return;
+        }
+
+        // show loading indicator
+        resultsDiv.innerHTML = '<div class="text-center my-4"><div class="spinner-border text-primary" role="status"></div><div class="mt-2">Analyzing symptoms...</div></div>';
+        try {
+            const response = await fetch("{% url 'ai_diagnosis' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+                body: JSON.stringify({ symptoms: selected })
+            });
+            const data = await response.json();
+            if (data.error) {
+                resultsDiv.innerHTML = '<div class="alert alert-danger">' + data.error + '</div>';
+            } else {
+                if (data.results && data.results.length) {
+                    let html = '';
+                    data.results.forEach((r, idx) => {
+                        let borderClass = 'border-secondary';
+                        if (idx === 0) borderClass = 'border-success';
+                        else if (idx === 1) borderClass = 'border-info';
+                        html += `<div class="card mb-3 ${borderClass}">
+                                    <div class="card-body">
+                                        <h5 class="card-title">${r.disease}</h5>
+                                        <p class="card-text">Prediction: ${r.probability}%</p>
+                                        <a href="https://www.google.com/search?q=${encodeURIComponent(r.disease + ' disease symptoms treatment')}" target="_blank" class="btn btn-sm btn-outline-primary">More Info</a>
+                                    </div>
+                                 </div>`;
+                    });
+                    html += '<div class="mt-2"><small class="text-muted">This AI prediction is for informational purposes only and should not replace professional medical advice.</small></div>';
+                    resultsDiv.innerHTML = html;
+                } else {
+                    resultsDiv.innerHTML = '<div class="alert alert-info">No prediction available.</div>';
+                }
+            }
+        } catch (err) {
+            console.error(err);
+            resultsDiv.innerHTML = '<div class="alert alert-danger">Unexpected error occurred.</div>';
+        }
+    });
+});
+</script>
+{% endblock %}

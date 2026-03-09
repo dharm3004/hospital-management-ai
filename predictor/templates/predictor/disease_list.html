@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Disease List - Hospital AI{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="card fade-in-up">
+        <div class="card-header">
+          <h5 class="mb-0">Diseases</h5>
+        </div>
+        <div class="card-body">
+          <form method="get" class="mb-3">
+            <div class="input-group">
+              <input name="q" value="{{ search_query }}" placeholder="Search diseases" class="form-control" />
+              <button class="btn btn-outline-secondary">Search</button>
+            </div>
+          </form>
+          <div class="list-group">
+            {% for d in diseases %}
+              <a href="{% url 'disease_detail' d.id %}" class="list-group-item list-group-item-action">
+                <strong>{{ d.name }}</strong>
+                <div class="small text-muted">{{ d.short_description }}</div>
+              </a>
+            {% empty %}
+              <div class="text-muted">No diseases found.</div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

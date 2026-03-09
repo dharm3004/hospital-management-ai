@@ -1,0 +1,39 @@
+<footer class="mt-auto bg-white border-top">
+  <div class="container py-5">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <h5 class="fw-bold">Hospital AI</h5>
+        <p class="small text-muted">Delivering modern, compassionate healthcare with AI-powered tools.</p>
+        <p class="small mb-0">&copy; 2026 Hospital AI. All rights reserved.</p>
+      </div>
+      <div class="col-md-3">
+        <h6 class="fw-semibold">Quick Links</h6>
+        <ul class="list-unstyled small">
+          <li><a href="/">Home</a></li>
+          <!-- Predict Disease removed -->
+          <li><a href="{% url 'book_appointment' %}">Book Appointment</a></li>
+          <li><a href="{% url 'doctors_list' %}">Doctors</a></li>
+        </ul>
+      </div>
+      <div class="col-md-3">
+        <h6 class="fw-semibold">Departments</h6>
+        <ul class="list-unstyled small">
+          <li><a href="{% url 'departments' %}">All Departments</a></li>
+          <li><a href="{% url 'news' %}">News</a></li>
+        </ul>
+      </div>
+      <div class="col-md-2">
+        <h6 class="fw-semibold">Contact</h6>
+        <p class="small mb-1">Emergency: <span class="text-danger">+1-800-EMERGENCY</span></p>
+        <p class="small mb-0">Email: contact@hospitalai.example</p>
+      </div>
+    </div>
+    <hr>
+    <div class="d-flex justify-content-end align-items-center gap-3">
+      <a href="#" class="text-muted"><i class="bi bi-facebook"></i></a>
+      <a href="#" class="text-muted"><i class="bi bi-twitter"></i></a>
+      <a href="#" class="text-muted"><i class="bi bi-instagram"></i></a>
+      <a href="#" class="text-muted"><i class="bi bi-linkedin"></i></a>
+    </div>
+  </div>
+</footer>

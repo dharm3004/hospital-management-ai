@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
 			const q = search.value.trim().toLowerCase();
 			document.querySelectorAll('#symptom-list .symptom-btn').forEach(b=>{
 				const s = (b.dataset.symptom||b.textContent||'').toLowerCase();
-				if(!q || s.includes(q)) b.style.display = ''; else b.style.display='none';
+				if(!q || s.includes(q)) b.style.display = 'inline-block'; else b.style.display='none';
 			});
 		});
 	}
@@ -53,3 +53,4 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
 // Export helpers for inline templates
 window.HospitalAI = { getCookie, showToast, showLoading, hideLoading };
+

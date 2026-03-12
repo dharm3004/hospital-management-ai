@@ -1,7 +1,6 @@
 import os
 import json
 import pickle
-from functools import lru_cache
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse, HttpResponseBadRequest
@@ -30,57 +29,19 @@ def home(request):
     return render(request, 'predictor/index.html', context)
 
 
-def _coerce_bool(value, default=False):
-    """Coerce common JSON/HTML boolean representations to bool."""
-    if value is None:
-        return default
-    if isinstance(value, bool):
-        return value
-    if isinstance(value, (int, float)):
-        return bool(value)
-    if isinstance(value, str):
-        v = value.strip().lower()
-        if v in {'1', 'true', 'yes', 'y', 'on'}:
-            return True
-        if v in {'0', 'false', 'no', 'n', 'off'}:
-            return False
-    return default
-
-
-@lru_cache(maxsize=1)
 def load_model():
-    """Load and cache the ML model from `BASE_DIR/model_data.pkl`.
-
-    The result is cached to avoid re-unpickling on every request.
-    """
+    """Load the ML model from pickle file located in BASE_DIR"""
     model_path = os.path.join(settings.BASE_DIR, 'model_data.pkl')
     if not os.path.exists(model_path):
         raise FileNotFoundError('Model file not found')
-    try:
-        with open(model_path, 'rb') as f:
-            data = pickle.load(f)
-    except (pickle.UnpicklingError, EOFError, OSError) as exc:
-        raise RuntimeError('Model file could not be loaded') from exc
-
+    with open(model_path, 'rb') as f:
+        data = pickle.load(f)
     if isinstance(data, dict) and 'model' in data:
         model = data['model']
         features = data.get('features') or data.get('feature_names') or []
     else:
         model = data
         features = []
-
-    if features is None:
-        features = []
-    if not isinstance(features, list):
-        try:
-            features = list(features)
-        except Exception:
-            features = []
-    features = [str(f).strip() for f in features if str(f).strip()]
-
-    if model is None:
-        raise RuntimeError('Model payload missing')
-
     return {'model': model, 'features': features}
 
 
@@ -104,8 +65,6 @@ def ai_diagnosis(request):
         features = model_data['features']
     except Exception:
         return JsonResponse({'error': 'AI diagnosis service temporarily unavailable.'}, status=503)
-    if not features:
-        return JsonResponse({'error': 'AI diagnosis service not configured (no symptoms list).'}, status=503)
 
     # parse JSON body
     try:
@@ -115,29 +74,11 @@ def ai_diagnosis(request):
         data = {'symptoms': request.POST.getlist('symptoms', [])}
 
     symptoms = data.get('symptoms', []) or []
-    # basic input validation
-    if not isinstance(symptoms, list):
-        return JsonResponse({'error': 'Invalid symptoms format.'}, status=400)
-    symptoms = [str(s).strip() for s in symptoms if str(s).strip()]
     if not symptoms:
         return JsonResponse({'error': 'Please select at least one symptom'}, status=400)
-    if len(symptoms) > 30:
-        return JsonResponse({'error': 'Too many symptoms selected. Please choose the most important ones.'}, status=400)
-
-    # whether to save this prediction to history (default: True for backwards compatibility)
-    save_history = _coerce_bool(data.get('save_history'), default=True)
-
-    # ensure selected symptoms exist in model features
-    allowed = set(features)
-    invalid = [s for s in symptoms if s not in allowed]
-    if invalid:
-        sample = ', '.join(invalid[:5])
-        more = '' if len(invalid) <= 5 else f' (+{len(invalid) - 5} more)'
-        return JsonResponse({'error': f'Invalid symptom selection: {sample}{more}.'}, status=400)
 
     # construct feature vector
-    selected = set(symptoms)
-    feature_vector = [1 if feat in selected else 0 for feat in features]
+    feature_vector = [1 if feat in symptoms else 0 for feat in (features or [])]
     results = []
     try:
         import numpy as np
@@ -151,17 +92,15 @@ def ai_diagnosis(request):
             pairs.sort(key=lambda x: x[1], reverse=True)
             for name, prob in pairs[:3]:
                 results.append({'disease': str(name), 'probability': round(float(prob) * 100)})
-        elif hasattr(model, 'predict'):
+        else:
             preds = model.predict(X)
             if len(preds) > 0:
                 results.append({'disease': str(preds[0]), 'probability': 100})
-        else:
-            return JsonResponse({'error': 'Model is not a valid predictor.'}, status=500)
     except Exception:
         return JsonResponse({'error': 'Prediction error.'}, status=500)
 
-    # if the user is a logged-in patient and opted in, record this prediction
-    if request.user.is_authenticated and save_history and results:
+    # if the user is a logged-in patient, record this prediction
+    if request.user.is_authenticated:
         try:
             if hasattr(request.user, 'user_profile') and request.user.user_profile.role == 'patient':
                 PredictionHistory.objects.create(patient=request.user, symptoms=symptoms, results=results)
@@ -169,13 +108,7 @@ def ai_diagnosis(request):
             # don't let history failures affect API
             pass
 
-    summary = None
-    if results:
-        top = results[0]
-        summary = f"Most likely condition: {top['disease']} ({top['probability']}% confidence) based on {len(symptoms)} symptom(s)."
-
-    return JsonResponse({'results': results, 'summary': summary, 'symptom_count': len(symptoms)})
-
+    return JsonResponse({'results': results})
 
 
 @require_http_methods(["GET"])
@@ -418,3 +351,4 @@ def disease_info_json(request, name):
         'recommended_doctor': rec_doc,
     }
     return JsonResponse(data)
+

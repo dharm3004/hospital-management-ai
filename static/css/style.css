@@ -247,3 +247,236 @@ footer {
   padding: 20px 0;
   margin-top: auto;
 }
+
+/* AI diagnosis dashboard */
+.ai-diagnosis-dashboard {
+  background:
+    radial-gradient(circle at 8% 15%, rgba(13, 110, 253, 0.08) 0, transparent 35%),
+    radial-gradient(circle at 88% 12%, rgba(16, 185, 129, 0.12) 0, transparent 36%),
+    linear-gradient(180deg, #f5fbff 0%, #f4f7fb 100%);
+}
+
+.ai-hero {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.ai-kicker {
+  color: #0d6efd;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.ai-title {
+  font-size: clamp(1.8rem, 4vw, 2.9rem);
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.ai-subtitle {
+  color: #5f6f86;
+}
+
+.ai-panel {
+  border-radius: 24px;
+  border: 1px solid #e0ebff;
+}
+
+.ai-search-group .input-group-text {
+  border-radius: 14px 0 0 14px;
+  border: 1px solid #dce7fa;
+  background: #fff;
+  color: #0d6efd;
+}
+
+.ai-search-group .form-control {
+  border-radius: 0 14px 14px 0;
+  border: 1px solid #dce7fa;
+}
+
+.symptom-chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.symptom-chip {
+  border: 1px solid #d7e2f2;
+  border-radius: 20px;
+  background: #f6f9ff;
+  color: #3c4d67;
+  padding: 8px 14px;
+  font-size: 0.92rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, background-color 0.22s ease, color 0.22s ease, border-color 0.22s ease;
+}
+
+.symptom-chip:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(13, 110, 253, 0.16);
+  border-color: #0d6efd;
+  background: #ffffff;
+  color: #0d6efd;
+}
+
+.symptom-chip.selected {
+  background: #0d6efd;
+  color: #ffffff;
+  border-color: #0d6efd;
+  box-shadow: 0 8px 20px rgba(13, 110, 253, 0.25);
+}
+
+.selected-panel {
+  background: #f8fbff;
+  border: 1px solid #dbe8ff;
+  border-radius: 18px;
+  padding: 14px;
+  min-height: 154px;
+}
+
+.selected-chip-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 74px;
+}
+
+.selected-chip {
+  border-radius: 20px;
+  background: #e8f0ff;
+  color: #184587;
+  border: 1px solid #cfe0ff;
+  font-weight: 600;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.selected-chip:hover {
+  background: #d7e6ff;
+  transform: translateY(-1px);
+}
+
+.ripple-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-ripple {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  animation: ripple 0.58s linear;
+  background: rgba(255, 255, 255, 0.48);
+  pointer-events: none;
+}
+
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.prediction-card {
+  border-radius: 18px;
+  border: 1px solid #e4e9f2;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 10px 30px rgba(18, 32, 60, 0.08);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.prediction-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 36px rgba(18, 32, 60, 0.15);
+}
+
+.prediction-rank-1 {
+  border-color: #22a06b;
+  box-shadow: 0 10px 30px rgba(34, 160, 107, 0.2);
+}
+
+.prediction-rank-2 {
+  border-color: #0d6efd;
+}
+
+.prediction-rank-3 {
+  border-color: #9aa5b5;
+}
+
+.prediction-rank-badge {
+  border-radius: 999px;
+  background: #eef4ff;
+  color: #30548a;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+}
+
+.prediction-percent {
+  color: #516177;
+  font-size: 0.95rem;
+}
+
+.prediction-progress {
+  height: 10px;
+  border-radius: 999px;
+  background: #ecf1f8;
+  overflow: hidden;
+}
+
+.prediction-progress .progress-bar {
+  display: block;
+  height: 100%;
+  width: 0;
+  transition: width 1.2s cubic-bezier(0.25, 0.85, 0.35, 1);
+}
+
+.chart-card {
+  border-radius: 18px;
+  border: 1px solid #e2e8f3;
+  background: #fff;
+  box-shadow: 0 8px 22px rgba(18, 32, 60, 0.08);
+}
+
+.medical-disclaimer {
+  border-left: 4px solid #f59f00;
+  background: #fff8e8;
+  color: #664d03;
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.ai-empty-state {
+  border-radius: 18px;
+  box-shadow: 0 8px 22px rgba(18, 32, 60, 0.08);
+}
+
+@media (min-width: 768px) {
+  .result-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 575px) {
+  .symptom-chip,
+  .selected-chip {
+    font-size: 0.85rem;
+  }
+
+  .ai-panel {
+    border-radius: 18px;
+  }
+}
